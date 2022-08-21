@@ -1,5 +1,6 @@
-export default function App(){
-  return(
-    <h1>Hello World! My first app!</h1>
-  )
+import Button from "@mui/material/Button";
+import { app } from "./firebase/init";
+
+export default function App() {
+  return <Button variant="contained">Hello World</Button>;
 }
