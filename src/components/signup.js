@@ -1,6 +1,9 @@
 import * as React from "react";
+import { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -37,6 +40,9 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
+  const [error, setError] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userPassword, setUserPassword] = useState("");
   let navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -44,20 +50,28 @@ export default function SignUp() {
     const data = new FormData(event.currentTarget);
 
     //changed:
+    //TODO: Understand how this line really works ki signup ke baad hi navigate kyu chalta hai?
     const auth = getAuth();
-    await createUserWithEmailAndPassword(
-      auth,
-      data.get("email"),
-      data.get("password")
-    );
-    navigate("/");
+    try {
+      await createUserWithEmailAndPassword(
+        auth,
+        data.get("email"),
+        data.get("password")
+      );
+      navigate("/");
+    } catch (error) {
+      setError(error.message);
+      console.log(error);
+      setUserEmail("");
+      setUserPassword("");
+    }
 
     console.log({
       email: data.get("email"),
       password: data.get("password"),
     });
   };
-
+  //TODO: THis InputText field me `value` might cause an errror in future
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -83,6 +97,12 @@ export default function SignUp() {
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
+              {error && (
+                <Grid item xs={12}>
+                  <Alert severity="error">{error}</Alert>
+                </Grid>
+              )}
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   autoComplete="given-name"
@@ -112,6 +132,8 @@ export default function SignUp() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  value={userEmail}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -123,6 +145,8 @@ export default function SignUp() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                  onChange={(e) => setUserPassword(e.target.value)}
+                  value={userPassword}
                 />
               </Grid>
             </Grid>
